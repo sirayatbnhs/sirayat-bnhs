@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIRAYAT | Editorial Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<header class="admin-top"><a href="index.html" class="brand">SIRAYAT<span>.</span></a><span>EDITORIAL MANAGEMENT SYSTEM</span><a href="index.html" class="back-link">← View public site</a></header>
+<main class="admin-wrap">
+  <section id="setupNotice" class="notice">
+    <strong>Backend setup required</strong>
+    <p>This dashboard is prepared for Supabase authentication and database storage. Add your Supabase project URL and anon key in <code>admin.js</code>, then run <code>supabase-schema.sql</code> in your Supabase SQL Editor. Until configured, sign-in and publishing are unavailable.</p>
+  </section>
+  <section id="loginPanel" class="login-card">
+    <div class="eyebrow">SIRAYAT · BUTIG NATIONAL HIGH SCHOOL</div>
+    <h1>Editorial Dashboard</h1>
+    <p class="muted">Sign in using your authorized editorial account.</p>
+    <form id="loginForm">
+      <label>Email address<input id="email" type="email" required autocomplete="username" placeholder="name@example.com"></label>
+      <label>Password<input id="password" type="password" required autocomplete="current-password" placeholder="Your password"></label>
+      <button class="primary" type="submit">Sign in securely</button>
+      <p id="loginMessage" class="message" aria-live="polite"></p>
+    </form>
+    <small>Accounts should be created and assigned roles by the publication administrator. Public registration is disabled.</small>
+  </section>
+  <section id="dashboard" hidden>
+    <div class="welcome-row"><div><div class="eyebrow">NEWSROOM WORKSPACE</div><h1>Article Manager</h1><p class="muted" id="userRole"></p></div><button id="logoutBtn" class="secondary">Sign out</button></div>
+    <div class="stats"><div><span>YOUR ACCESS</span><strong id="roleStat">—</strong></div><div><span>ARTICLES LOADED</span><strong id="countStat">0</strong></div><div><span>WORKSPACE</span><strong>LIVE DB</strong></div></div>
+    <div class="workspace">
+      <section class="editor-card">
+        <h2 id="formHeading">Create an article</h2>
+        <form id="articleForm">
+          <input type="hidden" id="articleId">
+          <label>Article title<input id="articleTitle" maxlength="180" required></label>
+          <label>Filipino title (optional)<input id="articleTitleFil" maxlength="180"></label>
+          <div class="two-col"><label>Section<select id="articleCategory" required><option>News</option><option>Editorial</option><option>Feature</option><option>Sports</option><option>Science & Technology</option><option>Literary</option><option>Photojournalism</option></select></label><label>Status<select id="articleStatus"><option value="draft">Draft</option><option value="for_review">Submit for review</option></select></label></div>
+          <label>Short summary<textarea id="articleExcerpt" rows="3" maxlength="400" required></textarea></label>
+          <label>Article body<textarea id="articleBody" rows="10" required></textarea></label>
+          <label>Filipino article body (optional)<textarea id="articleBodyFil" rows="7"></textarea></label>
+          <div class="form-actions"><button class="primary" type="submit">Save article</button><button class="secondary" type="button" id="clearBtn">Clear form</button></div>
+          <p id="formMessage" class="message" aria-live="polite"></p>
+        </form>
+      </section>
+      <section class="list-card">
+        <div class="list-heading"><h2>Newsroom articles</h2><button class="secondary" id="refreshBtn">Refresh</button></div>
+        <div id="articleList" class="article-list"><p class="muted">Sign in to load articles.</p></div>
+      </section>
+    </div>
+  </section>
+</main>
+<footer>© 2026 SIRAYAT · BUTIG NATIONAL HIGH SCHOOL</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="admin.js"></script>
+</body></html>
