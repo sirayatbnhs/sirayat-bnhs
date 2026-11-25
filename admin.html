@@ -20,6 +20,27 @@
     <p class="muted">Sign in using your authorized editorial account.</p>
     <form id="loginForm">
       <label>Email address<input id="email" type="email" required autocomplete="username" placeholder="name@example.com"></label>
+      
+<label>Author name
+  <input id="authorName" maxlength="120" placeholder="Name of writer or editorial desk">
+</label>
+
+<label>Article cover photo
+  <input
+    id="articleImage"
+    type="file"
+    accept="image/jpeg,image/png,image/webp"
+  >
+  <small>JPG, PNG, or WebP · Maximum 5 MB</small>
+</label>
+
+<img
+  id="imagePreview"
+  alt="Article cover preview"
+  hidden
+  style="max-width:100%;max-height:220px;object-fit:cover;border-radius:8px;"
+>
+
       <label>Password<input id="password" type="password" required autocomplete="current-password" placeholder="Your password"></label>
       <button class="primary" type="submit">Sign in securely</button>
       <p id="loginMessage" class="message" aria-live="polite"></p>
