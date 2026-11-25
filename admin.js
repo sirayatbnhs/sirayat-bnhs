@@ -2,7 +2,7 @@
 // Uses Supabase Publishable Key only. Never use service_role here.
 
 const SUPABASE_URL = "https://elidsfdxjowuvpqmzefq.supabase.co";
-const SUPABASE_ANON_KEY = "PASTE_YOUR_EXISTING_PUBLISHABLE_KEY_HERE";
+const SUPABASE_ANON_KEY = "sb_publishable_vD4mcf115FSQj-yVkBDi9g_ayxo5Q57";
 const BUCKET = "sirayat-articles";
 
 const configured =
