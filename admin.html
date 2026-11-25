@@ -20,26 +20,6 @@
     <p class="muted">Sign in using your authorized editorial account.</p>
     <form id="loginForm">
       <label>Email address<input id="email" type="email" required autocomplete="username" placeholder="name@example.com"></label>
-      
-<label>Author name
-  <input id="authorName" maxlength="120" placeholder="Name of writer or editorial desk">
-</label>
-
-<label>Article cover photo
-  <input
-    id="articleImage"
-    type="file"
-    accept="image/jpeg,image/png,image/webp"
-  >
-  <small>JPG, PNG, or WebP · Maximum 5 MB</small>
-</label>
-
-<img
-  id="imagePreview"
-  alt="Article cover preview"
-  hidden
-  style="max-width:100%;max-height:220px;object-fit:cover;border-radius:8px;"
->
 
       <label>Password<input id="password" type="password" required autocomplete="current-password" placeholder="Your password"></label>
       <button class="primary" type="submit">Sign in securely</button>
@@ -61,6 +41,17 @@
           <label>Short summary<textarea id="articleExcerpt" rows="3" maxlength="400" required></textarea></label>
           <label>Article body<textarea id="articleBody" rows="10" required></textarea></label>
           <label>Filipino article body (optional)<textarea id="articleBodyFil" rows="7"></textarea></label>
+          <label>Author name
+<input id="authorName" maxlength="120" placeholder="Name of writer or editorial desk">
+</label>
+
+<label>Article cover photo
+<input id="articleImage" type="file" accept="image/jpeg,image/png,image/webp">
+<small>JPG, PNG, or WebP · Maximum 5 MB</small>
+</label>
+
+<img id="imagePreview" alt="Article cover preview" hidden
+style="max-width:100%;max-height:220px;object-fit:cover;border-radius:8px;">
           <div class="form-actions"><button class="primary" type="submit">Save article</button><button class="secondary" type="button" id="clearBtn">Clear form</button></div>
           <p id="formMessage" class="message" aria-live="polite"></p>
         </form>
