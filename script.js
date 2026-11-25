@@ -1,46 +1,254 @@
-const stories = [
-  {id:1,category:"News",date:"November 2026",author:"SIRAYAT News Desk",title:"Campus stories begin here: Welcome to SIRAYAT",titleFil:"Dito nagsisimula ang mga kuwento ng paaralan: Maligayang pagdating sa SIRAYAT",excerpt:"Meet the digital home of student journalism at Butig National High School.",excerptFil:"Kilalanin ang digital na tahanan ng pamamahayag ng mga mag-aaral ng Butig National High School.",body:"SIRAYAT is the official school publication of Butig National High School. This digital platform is designed to bring campus news, student perspectives, creative writing, sports updates, and photo stories to the school community. This is a starter article. Replace this text with a verified report written and reviewed by your editorial team.",bodyFil:"Ang SIRAYAT ang opisyal na pahayagang pampaaralan ng Butig National High School. Itinatag ang digital platform na ito upang maihatid sa komunidad ng paaralan ang mga balita, pananaw ng mag-aaral, malikhaing akda, balitang pampalakasan, at mga kuwentong larawan. Halimbawang artikulo ito. Palitan ang teksto ng beripikadong ulat na isinulat at sinuri ng inyong editorial team."},
-  {id:2,category:"Editorial",date:"November 2026",author:"Editorial Board",title:"The value of a free and responsible student press",titleFil:"Ang halaga ng malaya at responsableng pamamahayag ng mag-aaral",excerpt:"A school publication gives learners a space to ask questions, examine issues, and speak with purpose.",excerptFil:"Nagbibigay ang pahayagang pampaaralan ng puwang upang magtanong, magsuri, at magpahayag ang mga mag-aaral.",body:"A responsible student press does more than report events. It listens, verifies information, considers different perspectives, and gives the school community a thoughtful space for discussion. Replace this sample with an approved editorial reflecting your publication's position.",bodyFil:"Higit pa sa pagbabalita ng mga pangyayari ang tungkulin ng responsableng pahayagang pampaaralan. Nakikinig ito, nagsusuri ng impormasyon, isinasaalang-alang ang iba't ibang pananaw, at nagbibigay ng makabuluhang espasyo para sa talakayan. Palitan ang halimbawang ito ng editoryal na aprubado ng inyong lupon."},
-  {id:3,category:"Feature",date:"November 2026",author:"Feature Desk",title:"The people and stories that shape our campus",titleFil:"Ang mga taong humuhubog sa ating paaralan",excerpt:"Every school day holds stories of dedication, discovery, and quiet acts of kindness.",excerptFil:"Bawat araw sa paaralan ay may kuwento ng dedikasyon, pagtuklas, at simpleng kabutihan.",body:"Behind every school activity are people whose efforts make learning communities stronger. A feature story can bring these experiences to life through interviews, observation, and vivid but accurate details. Replace this sample with an original feature article.",bodyFil:"Sa likod ng bawat gawain sa paaralan ay mga taong nagsisikap upang patatagin ang komunidad ng pagkatuto. Naipapakita ng lathalain ang kanilang karanasan sa pamamagitan ng panayam, pagmamasid, at makatotohanang detalye. Palitan ito ng orihinal na lathalain."},
-  {id:4,category:"Sports",date:"November 2026",author:"Sports Desk",title:"Beyond the scoreboard: discipline, teamwork, and sportsmanship",titleFil:"Higit pa sa puntos: disiplina, pagtutulungan, at sportsmanship",excerpt:"Sports stories are also stories about preparation, resilience, and respect.",excerptFil:"Ang mga kuwento sa palakasan ay kuwento rin ng paghahanda, katatagan, at paggalang.",body:"A complete sports report tells readers what happened, who was involved, and why the result matters. It also checks scores, names, dates, and statements before publication. Replace this sample with a verified school sports report.",bodyFil:"Inilalahad ng mahusay na ulat pampalakasan kung ano ang nangyari, sino ang sangkot, at bakit mahalaga ang resulta. Tiyakin ang mga puntos, pangalan, petsa, at pahayag bago ilathala. Palitan ito ng beripikadong ulat pampalakasan."},
-  {id:5,category:"Science & Technology",date:"November 2026",author:"Sci-Tech Desk",title:"Curiosity in the classroom: learning through technology",titleFil:"Pag-usisa sa silid-aralan: pagkatuto sa tulong ng teknolohiya",excerpt:"Explore how thoughtful use of technology can support learning and problem-solving.",excerptFil:"Tuklasin kung paano makatutulong ang wastong paggamit ng teknolohiya sa pagkatuto at paglutas ng suliranin.",body:"Technology is most useful when it helps learners investigate questions, create solutions, and evaluate information critically. Replace this sample with a researched science or technology article with reliable sources.",bodyFil:"Pinakamahalaga ang teknolohiya kapag nakatutulong ito sa mga mag-aaral na magsiyasat, lumikha ng solusyon, at mapanuring magsuri ng impormasyon. Palitan ito ng artikulong pang-agham o teknolohiya na may mapagkakatiwalaang sanggunian."},
-  {id:6,category:"Literary",date:"November 2026",author:"Literary Desk",title:"A space for words, imagination, and young voices",titleFil:"Puwang para sa mga salita, imahinasyon, at tinig ng kabataan",excerpt:"Poetry and creative writing give students another way to express what matters.",excerptFil:"Nagbibigay ang tula at malikhaing pagsulat ng ibang paraan upang maipahayag ng mga mag-aaral ang mahalaga sa kanila.",body:"The literary page welcomes original poetry, essays, short fiction, and other creative work. Submissions should be original and reviewed for clarity, respect, and appropriateness before publication.",bodyFil:"Tumatanggap ang pahinang pampanitikan ng orihinal na tula, sanaysay, maikling kuwento, at iba pang malikhaing akda. Dapat orihinal ang mga ipapasa at masuri ang kalinawan, paggalang, at pagiging angkop bago ilathala."}
-];
+
+// SIRAYAT Public Homepage - Supabase Integration
+
+const SUPABASE_URL = "https://elidsfdxjowuvpqmzefq.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_vD4mcf115FSQj-yVkBDi9g_ayxo5Q57";
+
+const client = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+let stories = [];
 let language = "en";
 let activeSection = "all";
 let query = "";
+
 const grid = document.getElementById("storyGrid");
 const empty = document.getElementById("emptyState");
 const dialog = document.getElementById("articleDialog");
-const labels = {News:"NEWS",Editorial:"EDITORIAL",Feature:"FEATURE",Sports:"SPORTS","Science & Technology":"SCIENCE & TECHNOLOGY",Literary:"LITERARY",Photojournalism:"PHOTOJOURNALISM"};
-const labelsFil = {News:"BALITA",Editorial:"EDITORYAL",Feature:"LATHALAIN",Sports:"PALAKASAN","Science & Technology":"AGHAM AT TEKNOLOHIYA",Literary:"PANITIKAN",Photojournalism:"PAMAMAHAYAG SA LARAWAN"};
-function render(){
- const filtered = stories.filter(s => (activeSection==="all" || s.category===activeSection) && [s.title,s.titleFil,s.excerpt,s.excerptFil,s.category,s.author].join(" ").toLowerCase().includes(query.toLowerCase()));
- grid.innerHTML = filtered.map((s,i)=>`<article class="story-card" data-id="${s.id}" tabindex="0" role="button" aria-label="Read ${s.title}"><div class="story-thumb tone-${(i%3)+1}">${labels[s.category]||s.category.toUpperCase()}</div><div class="story-body"><div class="story-category">${language==="en"?(labels[s.category]||s.category):(labelsFil[s.category]||s.category)}</div><h3>${language==="en"?s.title:s.titleFil}</h3><p>${language==="en"?s.excerpt:s.excerptFil}</p><div class="story-meta"><span>${s.author.toUpperCase()}</span><span>${s.date.toUpperCase()}</span></div></div></article>`).join("");
- empty.hidden = filtered.length!==0;
- grid.querySelectorAll(".story-card").forEach(card=>{card.addEventListener("click",()=>openStory(Number(card.dataset.id)));card.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openStory(Number(card.dataset.id));}})});
+
+const labels = {
+  News: "NEWS",
+  Editorial: "EDITORIAL",
+  Feature: "FEATURE",
+  Sports: "SPORTS",
+  "Science & Technology": "SCIENCE & TECHNOLOGY",
+  Literary: "LITERARY",
+  Photojournalism: "PHOTOJOURNALISM"
+};
+
+const labelsFil = {
+  News: "BALITA",
+  Editorial: "EDITORYAL",
+  Feature: "LATHALAIN",
+  Sports: "PALAKASAN",
+  "Science & Technology": "AGHAM AT TEKNOLOHIYA",
+  Literary: "PANITIKAN",
+  Photojournalism: "PAMAMAHAYAG SA LARAWAN"
+};
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
 }
-function openStory(id){
- const s=stories.find(x=>x.id===id); if(!s)return;
- document.getElementById("dialogContent").innerHTML=`<div class="dialog-inner"><div class="story-category">${language==="en"?(labels[s.category]||s.category):(labelsFil[s.category]||s.category)} · ${s.date}</div><h2>${language==="en"?s.title:s.titleFil}</h2><p><strong>${s.author}</strong></p><p>${language==="en"?s.body:s.bodyFil}</p><p class="story-meta">SIRAYAT · BUTIG NATIONAL HIGH SCHOOL</p></div>`;
- dialog.showModal();
+
+function formatDate(value) {
+  if (!value) return "";
+  return new Date(value).toLocaleDateString(
+    language === "en" ? "en-US" : "fil-PH",
+    { year: "numeric", month: "long", day: "numeric" }
+  );
 }
-document.getElementById("closeDialog").addEventListener("click",()=>dialog.close());
-dialog.addEventListener("click",e=>{if(e.target===dialog)dialog.close()});
-document.querySelectorAll(".nav-link").forEach(btn=>btn.addEventListener("click",()=>{
- document.querySelectorAll(".nav-link").forEach(b=>b.classList.remove("active"));btn.classList.add("active");
- activeSection=btn.dataset.section; if(activeSection==="About"){document.getElementById("aboutSection").scrollIntoView();activeSection="all";} else if(activeSection==="all"){document.getElementById("latestSection").scrollIntoView();} else {document.getElementById("latestSection").scrollIntoView();}
- render(); document.getElementById("navItems").classList.remove("open");
-}));
-document.getElementById("searchForm").addEventListener("submit",e=>{e.preventDefault();query=document.getElementById("searchInput").value.trim();render();document.getElementById("latestSection").scrollIntoView();});
-document.getElementById("exploreBtn").addEventListener("click",()=>document.getElementById("latestSection").scrollIntoView());
-document.getElementById("menuToggle").addEventListener("click",()=>document.getElementById("navItems").classList.toggle("open"));
-document.getElementById("langToggle").addEventListener("click",()=>{
- language=language==="en"?"fil":"en";
- document.getElementById("langToggle").textContent=language==="en"?"FILIPINO":"ENGLISH";
- document.querySelectorAll("[data-en][data-fil]").forEach(el=>el.textContent=el.dataset[language]);
- document.getElementById("searchInput").placeholder=language==="en"?"Search stories...":"Maghanap ng mga artikulo...";
- render();
+
+function getTitle(story) {
+  return language === "en"
+    ? story.title
+    : (story.title_fil || story.title);
+}
+
+function getExcerpt(story) {
+  return language === "en"
+    ? story.excerpt
+    : (story.excerpt_fil || story.excerpt);
+}
+
+function getBody(story) {
+  return language === "en"
+    ? story.body
+    : (story.body_fil || story.body);
+}
+
+function render() {
+  const filtered = stories.filter(story => {
+    const matchesCategory =
+      activeSection === "all" || story.category === activeSection;
+
+    const searchable = [
+      story.title,
+      story.title_fil,
+      story.excerpt,
+      story.category
+    ].join(" ").toLowerCase();
+
+    return matchesCategory && searchable.includes(query.toLowerCase());
+  });
+
+  grid.innerHTML = filtered.map((story, index) => `
+    <article class="story-card"
+      data-id="${escapeHTML(story.id)}"
+      tabindex="0"
+      role="button"
+      aria-label="Read ${escapeHTML(story.title)}">
+
+      <div class="story-thumb tone-${(index % 3) + 1}">
+        ${escapeHTML(labels[story.category] || story.category)}
+      </div>
+
+      <div class="story-body">
+        <div class="story-category">
+          ${escapeHTML(
+            language === "en"
+              ? (labels[story.category] || story.category)
+              : (labelsFil[story.category] || story.category)
+          )}
+        </div>
+
+        <h3>${escapeHTML(getTitle(story))}</h3>
+        <p>${escapeHTML(getExcerpt(story))}</p>
+
+        <div class="story-meta">
+          <span>SIRAYAT</span>
+          <span>${escapeHTML(formatDate(story.published_at || story.created_at))}</span>
+        </div>
+      </div>
+    </article>
+  `).join("");
+
+  empty.hidden = filtered.length !== 0;
+
+  grid.querySelectorAll(".story-card").forEach(card => {
+    const open = () => openStory(card.dataset.id);
+
+    card.addEventListener("click", open);
+
+    card.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        open();
+      }
+    });
+  });
+}
+
+function openStory(id) {
+  const story = stories.find(item => String(item.id) === String(id));
+  if (!story) return;
+
+  const safeBody = escapeHTML(getBody(story)).replace(/\n/g, "<br>");
+
+  document.getElementById("dialogContent").innerHTML = `
+    <div class="dialog-inner">
+      <div class="story-category">
+        ${escapeHTML(
+          language === "en"
+            ? (labels[story.category] || story.category)
+            : (labelsFil[story.category] || story.category)
+        )}
+        · ${escapeHTML(formatDate(story.published_at || story.created_at))}
+      </div>
+
+      <h2>${escapeHTML(getTitle(story))}</h2>
+      <p><strong>SIRAYAT Editorial Team</strong></p>
+      <p>${safeBody}</p>
+      <p class="story-meta">SIRAYAT · BUTIG NATIONAL HIGH SCHOOL</p>
+    </div>
+  `;
+
+  dialog.showModal();
+}
+
+async function loadPublishedArticles() {
+  grid.innerHTML = "<p>Loading articles...</p>";
+
+  const { data, error } = await client
+    .from("articles")
+    .select("id,title,title_fil,category,excerpt,body,body_fil,published_at,created_at")
+    .eq("status", "published")
+    .order("published_at", { ascending: false })
+    .limit(100);
+
+  if (error) {
+    console.error("SIRAYAT Supabase error:", error);
+    grid.innerHTML = "<p>Unable to load articles. Please try again later.</p>";
+    empty.hidden = true;
+    return;
+  }
+
+  stories = data || [];
+  render();
+}
+
+document.getElementById("closeDialog")
+  .addEventListener("click", () => dialog.close());
+
+dialog.addEventListener("click", event => {
+  if (event.target === dialog) dialog.close();
 });
-document.getElementById("dateLine").textContent="BUTIG NATIONAL HIGH SCHOOL · SCHOOL PUBLICATION";
-render();
+
+document.querySelectorAll(".nav-link").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".nav-link")
+      .forEach(item => item.classList.remove("active"));
+
+    button.classList.add("active");
+    activeSection = button.dataset.section;
+
+    if (activeSection === "About") {
+      document.getElementById("aboutSection").scrollIntoView();
+      activeSection = "all";
+    } else {
+      document.getElementById("latestSection").scrollIntoView();
+    }
+
+    render();
+    document.getElementById("navItems").classList.remove("open");
+  });
+});
+
+document.getElementById("searchForm")
+  .addEventListener("submit", event => {
+    event.preventDefault();
+    query = document.getElementById("searchInput").value.trim();
+    render();
+    document.getElementById("latestSection").scrollIntoView();
+  });
+
+document.getElementById("exploreBtn")
+  .addEventListener("click", () => {
+    document.getElementById("latestSection").scrollIntoView();
+  });
+
+document.getElementById("menuToggle")
+  .addEventListener("click", () => {
+    document.getElementById("navItems").classList.toggle("open");
+  });
+
+document.getElementById("langToggle")
+  .addEventListener("click", () => {
+    language = language === "en" ? "fil" : "en";
+
+    document.getElementById("langToggle").textContent =
+      language === "en" ? "FILIPINO" : "ENGLISH";
+
+    document.querySelectorAll("[data-en][data-fil]").forEach(element => {
+      element.textContent = element.dataset[language];
+    });
+
+    document.getElementById("searchInput").placeholder =
+      language === "en"
+        ? "Search stories..."
+        : "Maghanap ng mga artikulo...";
+
+    render();
+  });
+
+document.getElementById("dateLine").textContent =
+  "BUTIG NATIONAL HIGH SCHOOL · SCHOOL PUBLICATION";
+
+loadPublishedArticles();
