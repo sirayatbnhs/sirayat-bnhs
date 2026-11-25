@@ -6,8 +6,8 @@ const SUPABASE_ANON_KEY = "sb_publishable_vD4mcf115FSQj-yVkBDi9g_ayxo5Q57";
 const BUCKET = "sirayat-articles";
 
 const configured =
-  SUPABASE_URL.startsWith("https://") &&
-  !SUPABASE_ANON_KEY.includes("PASTE_");
+  SUPABASE_URL.startsWith("https://elidsfdxjowuvpqmzefq.supabase.co") &&
+  !SUPABASE_ANON_KEY.includes("sb_publishable_vD4mcf115FSQj-yVkBDi9g_ayxo5Q57");
 
 const $ = id => document.getElementById(id);
 
