@@ -1,6 +1,4 @@
 
-// SIRAYAT Public Homepage - Supabase Integration
-
 const SUPABASE_URL = "https://elidsfdxjowuvpqmzefq.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_vD4mcf115FSQj-yVkBDi9g_ayxo5Q57";
 
@@ -38,83 +36,93 @@ const labelsFil = {
   Photojournalism: "PAMAMAHAYAG SA LARAWAN"
 };
 
-function escapeHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g, char => ({
+function safe(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
     '"': "&quot;",
     "'": "&#39;"
-  })[char]);
+  })[c]);
 }
 
-function formatDate(value) {
-  if (!value) return "";
-  return new Date(value).toLocaleDateString(
+function articleTitle(a) {
+  return language === "en"
+    ? a.title
+    : (a.title_fil || a.title);
+}
+
+function articleBody(a) {
+  return language === "en"
+    ? a.body
+    : (a.body_fil || a.body);
+}
+
+function categoryName(category) {
+  return language === "en"
+    ? (labels[category] || category)
+    : (labelsFil[category] || category);
+}
+
+function articleDate(a) {
+  const date = a.published_at || a.created_at;
+  if (!date) return "";
+
+  return new Date(date).toLocaleDateString(
     language === "en" ? "en-US" : "fil-PH",
     { year: "numeric", month: "long", day: "numeric" }
   );
 }
 
-function getTitle(story) {
-  return language === "en"
-    ? story.title
-    : (story.title_fil || story.title);
-}
-
-function getExcerpt(story) {
-  return language === "en"
-    ? story.excerpt
-    : (story.excerpt_fil || story.excerpt);
-}
-
-function getBody(story) {
-  return language === "en"
-    ? story.body
-    : (story.body_fil || story.body);
-}
-
 function render() {
-  const filtered = stories.filter(story => {
+  const filtered = stories.filter(a => {
     const matchesCategory =
-      activeSection === "all" || story.category === activeSection;
+      activeSection === "all" ||
+      a.category === activeSection;
 
     const searchable = [
-      story.title,
-      story.title_fil,
-      story.excerpt,
-      story.category
+      a.title,
+      a.title_fil,
+      a.excerpt,
+      a.category,
+      a.author_name
     ].join(" ").toLowerCase();
 
-    return matchesCategory && searchable.includes(query.toLowerCase());
+    return matchesCategory &&
+      searchable.includes(query.toLowerCase());
   });
 
-  grid.innerHTML = filtered.map((story, index) => `
+  grid.innerHTML = filtered.map((a, i) => `
     <article class="story-card"
-      data-id="${escapeHTML(story.id)}"
+      data-id="${safe(a.id)}"
       tabindex="0"
       role="button"
-      aria-label="Read ${escapeHTML(story.title)}">
+      aria-label="Read ${safe(articleTitle(a))}">
 
-      <div class="story-thumb tone-${(index % 3) + 1}">
-        ${escapeHTML(labels[story.category] || story.category)}
-      </div>
+      ${a.image_url
+        ? `<img
+            src="${safe(a.image_url)}"
+            alt="${safe(articleTitle(a))}"
+            loading="lazy"
+            style="width:100%;height:210px;object-fit:cover;display:block;"
+          >`
+        : `<div class="story-thumb tone-${(i % 3) + 1}">
+            ${safe(categoryName(a.category))}
+          </div>`
+      }
 
       <div class="story-body">
         <div class="story-category">
-          ${escapeHTML(
-            language === "en"
-              ? (labels[story.category] || story.category)
-              : (labelsFil[story.category] || story.category)
-          )}
+          ${safe(categoryName(a.category))}
         </div>
 
-        <h3>${escapeHTML(getTitle(story))}</h3>
-        <p>${escapeHTML(getExcerpt(story))}</p>
+        <h3>${safe(articleTitle(a))}</h3>
+
+        <p>${safe(a.excerpt || "")}</p>
 
         <div class="story-meta">
-          <span>SIRAYAT</span>
-          <span>${escapeHTML(formatDate(story.published_at || story.created_at))}</span>
+          <span>${safe(a.author_name || "SIRAYAT Editorial Team")}</span>
+          <span>${safe(articleDate(a))}</span>
         </div>
       </div>
     </article>
@@ -122,14 +130,20 @@ function render() {
 
   empty.hidden = filtered.length !== 0;
 
+  if (filtered.length === 0) {
+    empty.textContent = language === "en"
+      ? "No published stories found."
+      : "Walang nailathalang artikulo.";
+  }
+
   grid.querySelectorAll(".story-card").forEach(card => {
     const open = () => openStory(card.dataset.id);
 
     card.addEventListener("click", open);
 
-    card.addEventListener("keydown", event => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
+    card.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
         open();
       }
     });
@@ -137,26 +151,37 @@ function render() {
 }
 
 function openStory(id) {
-  const story = stories.find(item => String(item.id) === String(id));
-  if (!story) return;
+  const a = stories.find(item => String(item.id) === String(id));
+  if (!a) return;
 
-  const safeBody = escapeHTML(getBody(story)).replace(/\n/g, "<br>");
+  const body = safe(articleBody(a)).replace(/\n/g, "<br>");
 
   document.getElementById("dialogContent").innerHTML = `
     <div class="dialog-inner">
+
+      ${a.image_url
+        ? `<img
+            src="${safe(a.image_url)}"
+            alt="${safe(articleTitle(a))}"
+            style="width:100%;max-height:420px;object-fit:cover;margin-bottom:20px;border-radius:6px;"
+          >`
+        : ""
+      }
+
       <div class="story-category">
-        ${escapeHTML(
-          language === "en"
-            ? (labels[story.category] || story.category)
-            : (labelsFil[story.category] || story.category)
-        )}
-        · ${escapeHTML(formatDate(story.published_at || story.created_at))}
+        ${safe(categoryName(a.category))}
+        · ${safe(articleDate(a))}
       </div>
 
-      <h2>${escapeHTML(getTitle(story))}</h2>
-      <p><strong>SIRAYAT Editorial Team</strong></p>
-      <p>${safeBody}</p>
-      <p class="story-meta">SIRAYAT · BUTIG NATIONAL HIGH SCHOOL</p>
+      <h2>${safe(articleTitle(a))}</h2>
+
+      <p><strong>${safe(a.author_name || "SIRAYAT Editorial Team")}</strong></p>
+
+      <p>${body}</p>
+
+      <p class="story-meta">
+        SIRAYAT · BUTIG NATIONAL HIGH SCHOOL
+      </p>
     </div>
   `;
 
@@ -164,18 +189,19 @@ function openStory(id) {
 }
 
 async function loadPublishedArticles() {
-  grid.innerHTML = "<p>Loading articles...</p>";
+  grid.innerHTML = "<p>Loading published stories...</p>";
 
   const { data, error } = await client
     .from("articles")
-    .select("id,title,title_fil,category,excerpt,body,body_fil,published_at,created_at")
+    .select("id,title,title_fil,category,excerpt,body,body_fil,author_name,image_url,published_at,created_at")
     .eq("status", "published")
     .order("published_at", { ascending: false })
     .limit(100);
 
   if (error) {
-    console.error("SIRAYAT Supabase error:", error);
-    grid.innerHTML = "<p>Unable to load articles. Please try again later.</p>";
+    console.error("SIRAYAT article loading error:", error);
+    grid.innerHTML =
+      "<p>Unable to load stories. Please try again later.</p>";
     empty.hidden = true;
     return;
   }
@@ -184,20 +210,22 @@ async function loadPublishedArticles() {
   render();
 }
 
+// CLOSE ARTICLE
 document.getElementById("closeDialog")
   .addEventListener("click", () => dialog.close());
 
-dialog.addEventListener("click", event => {
-  if (event.target === dialog) dialog.close();
+dialog.addEventListener("click", e => {
+  if (e.target === dialog) dialog.close();
 });
 
-document.querySelectorAll(".nav-link").forEach(button => {
-  button.addEventListener("click", () => {
+// CATEGORY NAVIGATION
+document.querySelectorAll(".nav-link").forEach(btn => {
+  btn.addEventListener("click", () => {
     document.querySelectorAll(".nav-link")
-      .forEach(item => item.classList.remove("active"));
+      .forEach(b => b.classList.remove("active"));
 
-    button.classList.add("active");
-    activeSection = button.dataset.section;
+    btn.classList.add("active");
+    activeSection = btn.dataset.section;
 
     if (activeSection === "About") {
       document.getElementById("aboutSection").scrollIntoView();
@@ -211,24 +239,28 @@ document.querySelectorAll(".nav-link").forEach(button => {
   });
 });
 
+// SEARCH
 document.getElementById("searchForm")
-  .addEventListener("submit", event => {
-    event.preventDefault();
+  .addEventListener("submit", e => {
+    e.preventDefault();
     query = document.getElementById("searchInput").value.trim();
     render();
     document.getElementById("latestSection").scrollIntoView();
   });
 
+// EXPLORE BUTTON
 document.getElementById("exploreBtn")
   .addEventListener("click", () => {
     document.getElementById("latestSection").scrollIntoView();
   });
 
+// MOBILE MENU
 document.getElementById("menuToggle")
   .addEventListener("click", () => {
     document.getElementById("navItems").classList.toggle("open");
   });
 
+// LANGUAGE TOGGLE
 document.getElementById("langToggle")
   .addEventListener("click", () => {
     language = language === "en" ? "fil" : "en";
@@ -236,9 +268,10 @@ document.getElementById("langToggle")
     document.getElementById("langToggle").textContent =
       language === "en" ? "FILIPINO" : "ENGLISH";
 
-    document.querySelectorAll("[data-en][data-fil]").forEach(element => {
-      element.textContent = element.dataset[language];
-    });
+    document.querySelectorAll("[data-en][data-fil]")
+      .forEach(el => {
+        el.textContent = el.dataset[language];
+      });
 
     document.getElementById("searchInput").placeholder =
       language === "en"
@@ -251,4 +284,5 @@ document.getElementById("langToggle")
 document.getElementById("dateLine").textContent =
   "BUTIG NATIONAL HIGH SCHOOL · SCHOOL PUBLICATION";
 
+// START
 loadPublishedArticles();
