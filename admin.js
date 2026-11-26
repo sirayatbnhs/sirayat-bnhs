@@ -5,9 +5,14 @@ const SUPABASE_URL = "https://elidsfdxjowuvpqmzefq.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_vD4mcf115FSQj-yVkBDi9g_ayxo5Q57";
 const BUCKET = "sirayat-articles";
 
+
 const configured =
-  SUPABASE_URL.startsWith("https://elidsfdxjowuvpqmzefq.supabase.co") &&
-  !SUPABASE_ANON_KEY.includes("sb_publishable_vD4mcf115FSQj-yVkBDi9g_ayxo5Q57");
+  SUPABASE_URL.startsWith("https://") &&
+  !SUPABASE_URL.includes("YOUR_") &&
+  SUPABASE_ANON_KEY.startsWith("sb_publishable_") &&
+  !SUPABASE_ANON_KEY.includes("YOUR_");
+
+
 
 const $ = id => document.getElementById(id);
 
